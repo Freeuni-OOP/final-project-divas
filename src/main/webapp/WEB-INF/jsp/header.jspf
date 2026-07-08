@@ -1,0 +1,21 @@
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${pageTitle != null ? pageTitle : 'Quiz Website'}</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+</head>
+<body>
+<nav class="topnav">
+    <a class="brand" href="${pageContext.request.contextPath}/home">QuizSite</a>
+    <a href="${pageContext.request.contextPath}/home">Home</a>
+    <a href="${pageContext.request.contextPath}/friends">Friends</a>
+    <a href="${pageContext.request.contextPath}/inbox">Inbox</a>
+    <a href="${pageContext.request.contextPath}/search">Find Users</a>
+    <a class="right" href="${pageContext.request.contextPath}/logout">Logout</a>
+</nav>
+<main class="container">
