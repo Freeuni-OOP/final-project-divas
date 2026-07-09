@@ -1,0 +1,35 @@
+package org.example.quiz.util;
+
+import org.example.quiz.dao.AchievementDAO;
+import org.example.quiz.dao.QuizReadDAO;
+import org.example.quiz.dao.QuizAttemptDAO;
+import org.example.quiz.model.AchievementType;
+import org.example.quiz.model.QuizAttempt;
+
+import java.sql.SQLException;
+
+public class AchievementChecker {
+
+    private final AchievementDAO achievementDAO = new AchievementDAO();
+    private final QuizReadDAO quizReadDAO = new QuizReadDAO();
+    private final QuizAttemptDAO attemptDAO = new QuizAttemptDAO();
+
+    public void onQuizCreated(long userId) throws SQLException {
+        int count = quizReadDAO.countCreatedQuizzes(userId);
+        if (count >= 1)  achievementDAO.grant(userId, AchievementType.AMATEUR_AUTHOR);
+        if (count >= 5)  achievementDAO.grant(userId, AchievementType.PROLIFIC_AUTHOR);
+        if (count >= 10) achievementDAO.grant(userId, AchievementType.PRODIGIOUS_AUTHOR);
+    }
+
+    public void onQuizSubmitted(QuizAttempt attempt) throws SQLException {
+        long userId = attempt.getUserId();
+        if (attemptDAO.countAttempts(userId) >= 10) {
+            achievementDAO.grant(userId, AchievementType.QUIZ_MACHINE);
+        }
+        if (attempt.isPractice()) {
+            achievementDAO.grant(userId, AchievementType.PRACTICE_MAKES_PERFECT);
+        } else if (attemptDAO.isTopScore(attempt)) {
+            achievementDAO.grant(userId, AchievementType.I_AM_THE_GREATEST);
+        }
+    }
+}

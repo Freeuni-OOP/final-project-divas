@@ -71,30 +71,34 @@ public class QuizReadDAO {
         }
         return quiz;
     }
-
-    private Quiz mapQuiz(ResultSet rs) throws SQLException {
-        Quiz q = new Quiz();
-        q.setId(rs.getLong("id"));
-        q.setTitle(rs.getString("title"));
-        q.setDescription(rs.getString("description"));
-        q.setCreatorId(rs.getLong("creator_id"));
-        q.setRandomize(rs.getBoolean("randomize"));
-        q.setMultiPage(rs.getBoolean("multi_page"));
-        q.setImmediateCorrect(rs.getBoolean("immediate_correct"));
-        q.setPracticeAllowed(rs.getBoolean("practice_allowed"));
-        q.setCreatedAt(rs.getTimestamp("created_at"));
-        return q;
+    /*
+    public int countCreatedQuizzes(long userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM quizzes WHERE creator_id=?";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        }
     }
 
-    private Question mapQuestion(ResultSet rs) throws SQLException {
-        Question q = new Question();
-        q.setId(rs.getLong("id"));
-        q.setQuizId(rs.getLong("quiz_id"));
-        q.setType(Question.Type.valueOf(rs.getString("question_type")));
-        q.setPrompt(rs.getString("prompt"));
-        q.setImageUrl(rs.getString("image_url"));
-        q.setOrdered(rs.getBoolean("ordered"));
-        q.setPosition(rs.getInt("position"));
-        return q;
+    public java.util.List<Quiz> getPopular(int limit) throws SQLException {
+        String sql = "SELECT q.* FROM quizzes q "
+                + "LEFT JOIN quiz_attempts a ON a.quiz_id = q.id "
+                + "GROUP BY q.id ORDER BY COUNT(a.id) DESC LIMIT ?";
+        java.util.List<Quiz> out = new java.util.ArrayList<>();
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(mapQuiz(rs));
+            }
+        }
+        return out;
     }
+     */
+
+
 }
+
