@@ -1,19 +1,43 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<!-- PLACEHOLDER — Part B (Auth) owns the real login/register.
-     This stub lets Part C be tested independently. It sets a fake session
-     user so you can navigate friends/inbox/quiz-taking without full auth.
-     REMOVE before integration. -->
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><title>Login</title>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/style.css">
+</head>
 <body>
+
 <div class="container">
-    <h1>Login (placeholder)</h1>
-    <p class="muted">Part B will replace this with real authentication.</p>
-    <form method="post" action="${pageContext.request.contextPath}/devlogin" class="card">
-        <input type="text" name="userId" placeholder="user id (e.g. 1)" required/>
-        <input type="text" name="username" placeholder="username" required/>
-        <button class="btn primary" type="submit">Dev Login</button>
+    <h1>Login</h1>
+
+    <% if (request.getAttribute("error") != null) { %>
+    <p class="error">
+        <%= request.getAttribute("error") %>
+    </p>
+    <% } %>
+
+    <form method="post"
+          action="${pageContext.request.contextPath}/login"
+          class="card">
+
+        <input type="text"
+               name="username"
+               placeholder="Username"
+               required />
+
+        <input type="password"
+               name="password"
+               placeholder="Password"
+               required />
+
+        <button class="btn primary" type="submit">
+            Login
+        </button>
     </form>
+
 </div>
-</body></html>
+
+</body>
+</html>
