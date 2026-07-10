@@ -1,17 +1,14 @@
--- ============================================================
---  Quiz Website — Database Schema
+
 --  Shared team schema.
---    A: users, sessions
---    B: quizzes, questions, question_options, question_answers
+--    B: users, quizzes, questions, question_options, question_answers, announcements
 --    C: friendships, messages   (+ reads/writes quiz_attempts)
 --    D: achievements, user_achievements
 --  This file is auto-run by docker-compose on first MySQL start.
--- ============================================================
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- ---------- Part A: Users / Auth ----------
+--Part B: Users / Auth
 CREATE TABLE IF NOT EXISTS users (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     username      VARCHAR(64)  NOT NULL UNIQUE,
@@ -21,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ---------- Part B: Quizzes / Questions ----------
+--Part B: Quizzes / Questions
 CREATE TABLE IF NOT EXISTS quizzes (
     id                BIGINT AUTO_INCREMENT PRIMARY KEY,
     title             VARCHAR(255) NOT NULL,
@@ -66,7 +63,7 @@ CREATE TABLE IF NOT EXISTS question_answers (
     FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ---------- Part C: Quiz attempts (shared results table) ----------
+-- Part C: Quiz attempts (shared results table)
 -- Written by C's quiz-taking flow, read by B/D for stats & leaderboards.
 CREATE TABLE IF NOT EXISTS quiz_attempts (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -81,7 +78,7 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     FOREIGN KEY (user_id) REFERENCES users(id)   ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ---------- Part C: Friendships ----------
+--Part C: Friendships
 CREATE TABLE IF NOT EXISTS friendships (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     requester_id  BIGINT      NOT NULL,   -- user who sent the request
@@ -95,7 +92,7 @@ CREATE TABLE IF NOT EXISTS friendships (
     FOREIGN KEY (addressee_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ---------- Part C: Mail messages ----------
+--Part C: Mail messages
 CREATE TABLE IF NOT EXISTS messages (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
     sender_id    BIGINT      NOT NULL,
@@ -111,7 +108,7 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (quiz_id)      REFERENCES quizzes(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ---------- Part D: Achievements ----------
+-- Part D: Achievements
 CREATE TABLE IF NOT EXISTS user_achievements (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id          BIGINT      NOT NULL,
@@ -121,7 +118,7 @@ CREATE TABLE IF NOT EXISTS user_achievements (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- added by Kesaria, Admin (Announcements) --
+--Part B: Admin (Announcements)
 CREATE TABLE IF NOT EXISTS announcements (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     title      VARCHAR(255) NOT NULL,
@@ -132,7 +129,7 @@ CREATE TABLE IF NOT EXISTS announcements (
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ---------- Views used by C & D ----------
+--  Views used by C & D
 -- Leaderboard: best attempt per user per quiz, ranked by correctness then time.
 CREATE OR REPLACE VIEW v_quiz_leaderboard AS
 SELECT a.quiz_id,

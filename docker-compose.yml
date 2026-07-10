@@ -20,5 +20,19 @@ services:
       timeout: 5s
       retries: 10
 
+  app:
+    build: .
+    container_name: quizdb-app
+    restart: unless-stopped
+    environment:
+      DB_URL: "jdbc:mysql://mysql:3306/quizdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+      DB_USER: quizuser
+      DB_PASSWORD: quizpass
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
 volumes:
   mysql-data:
