@@ -26,12 +26,20 @@ public class Announcement {
         this.id = id;
     }
 
-    //getters for title and message, because they are not changed after creation
+    //setter and getter for the title
     public String getTitle() {
         return title;
     }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    //setter and getter for the message
     public String getMessage() {
         return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     //setter and getter for the admin who posted this
@@ -42,7 +50,7 @@ public class Announcement {
         this.authorID = authorID;
     }
 
-    //setter and getter for the active state of this announcement 
+    //setter and getter for the active state of this announcement
     public boolean isActive() {
         return active;
     }
