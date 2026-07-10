@@ -121,6 +121,17 @@ CREATE TABLE IF NOT EXISTS user_achievements (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- added by Kesaria, Admin (Announcements) --
+CREATE TABLE IF NOT EXISTS announcements (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title      VARCHAR(255) NOT NULL,
+    body       TEXT         NOT NULL,
+    created_by BIGINT       NOT NULL,
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    active     BOOLEAN      NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ---------- Views used by C & D ----------
 -- Leaderboard: best attempt per user per quiz, ranked by correctness then time.
 CREATE OR REPLACE VIEW v_quiz_leaderboard AS
