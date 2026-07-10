@@ -175,4 +175,33 @@ public class QuizAttemptDAO {
         try { a.setQuizTitle(rs.getString("quiz_title")); } catch (SQLException ignore) { }
         return a;
     }
+   /*
+    public int countAttempts(long userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM quiz_attempts WHERE user_id=? AND practice=FALSE";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        }
+    }
+
+    public boolean isTopScore(QuizAttempt attempt) throws SQLException {
+        String sql = "SELECT score_correct, time_seconds FROM v_quiz_leaderboard "
+                + "WHERE quiz_id=? ORDER BY score_correct DESC, time_seconds ASC LIMIT 1";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, attempt.getQuizId());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return true; // first attempt ever on this quiz
+                int topScore = rs.getInt("score_correct");
+                int topTime = rs.getInt("time_seconds");
+                return attempt.getScoreCorrect() >= topScore
+                        && attempt.getTimeSeconds() <= topTime;
+            }
+        }
+    }
+
+    */
 }
