@@ -22,7 +22,7 @@
 
 <h2>Your Friends</h2>
 <c:choose>
-    <c:when test="${empty friends}"><p>You have no friends yet. Find some!</p></c:when>
+    <c:when test="${empty friends}"><p>You don't have any friends.</p></c:when>
     <c:otherwise>
         <ul class="list">
             <c:forEach var="f" items="${friends}">

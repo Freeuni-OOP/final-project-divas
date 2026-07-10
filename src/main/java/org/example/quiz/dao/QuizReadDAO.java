@@ -11,14 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Read-only access to quizzes/questions for the taking-flow. (Part C)
- *
- * NOTE: this file originally assumed Question had a nested Type enum and
- * embedded Option/Answer lists (Question.getOptions()/getAnswers()). The
- * actual Question class was not built that way - it is a flat class with
- * questionType as a String and no embedded lists. Corrected below: options
- * and answers are fetched separately via getOptions()/getAnswers() instead
- * of being attached to the Question object.
+ * Read-only access to quizzes and questions for the taking-flow.
+ * Options and answers are fetched separately via getOptions()/getAnswers().
  */
 public class QuizReadDAO {
 

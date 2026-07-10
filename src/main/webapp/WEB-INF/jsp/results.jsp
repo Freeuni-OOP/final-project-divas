@@ -6,7 +6,7 @@
         <strong>${attempt.scoreCorrect} / ${attempt.scoreTotal}</strong>
         (${attempt.percent}%)</p>
     <p>Time taken: ${attempt.timeSeconds} seconds</p>
-    <c:if test="${attempt.practice}"><p class="tag">Practice mode — not recorded on the leaderboard</p></c:if>
+    <c:if test="${attempt.practice}"><p class="tag">Practice mode - not recorded on the leaderboard</p></c:if>
 </div>
 
 <c:if test="${not empty details}">

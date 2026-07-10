@@ -11,14 +11,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * NOTE: originally written against a Question with a nested Type enum and
- * embedded options/answers lists, and a 2-argument Grader.grade(q, responses).
- * Question was not built that way, so this test was rewritten to match the
- * actual model (questionType as a String, options/answers passed separately).
- * The multi-answer ordered/unordered tests were removed since QuestionAnswer
- * has no slot field - only the 4 required single-slot question types exist.
- */
 public class GraderTest {
 
     @Test

@@ -8,23 +8,12 @@ import org.example.quiz.model.QuestionOption;
 import java.util.List;
 
 /**
- * Scoring logic for a single question. (Part C core)
+ * Scoring logic for a single question.
  *
- * NOTE: this file originally assumed Question carried its own type as an
- * enum (Question.Type) and its own embedded options/answers lists
- * (q.getOptions()/q.getAnswers()). The actual Question class was not built
- * that way - questionType is a plain String and options/answers are fetched
- * separately (see QuizReadDAO.getOptions()/getAnswers()) and passed in here
- * as parameters instead. The multi-answer ordered/unordered slot logic was
- * also removed, since QuestionAnswer has no slot field - only the 4 required
- * question types (each with a single slot) are supported.
- *
- * Rules from the spec:
- *  - Question-Response / Fill-Blank / Picture-Response may have several legal
- *    answers; any one match scores the (single) slot.
- *  - Multiple-Choice: correct if the chosen option is a correct option.
- *
- * Comparison is case-insensitive and trims surrounding whitespace.
+ * Question-Response, Fill-Blank and Picture-Response may have several legal
+ * answers; any one match scores the slot. Multiple-Choice is correct if the
+ * chosen option is a correct option. Comparison is case-insensitive and
+ * trims surrounding whitespace.
  */
 public final class Grader {
 

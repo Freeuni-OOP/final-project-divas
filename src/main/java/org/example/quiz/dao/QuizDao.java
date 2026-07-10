@@ -73,6 +73,44 @@ public class QuizDao {
         return result;
     }
 
+    public List<Quiz> getRecent(int limit) throws SQLException {
+        String sql = "SELECT * FROM quizzes ORDER BY created_at DESC, id DESC LIMIT ?";
+        List<Quiz> result = new ArrayList<>();
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) result.add(mapQuiz(rs));
+            }
+        }
+        return result;
+    }
+
+    public List<Quiz> getAll() throws SQLException {
+        String sql = "SELECT * FROM quizzes ORDER BY created_at DESC";
+        List<Quiz> result = new ArrayList<>();
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) result.add(mapQuiz(rs));
+        }
+        return result;
+    }
+
+    public List<Quiz> getByCreator(long creatorId, int limit) throws SQLException {
+        String sql = "SELECT * FROM quizzes WHERE creator_id=? ORDER BY created_at DESC, id DESC LIMIT ?";
+        List<Quiz> result = new ArrayList<>();
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, creatorId);
+            ps.setInt(2, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) result.add(mapQuiz(rs));
+            }
+        }
+        return result;
+    }
+
     private Quiz mapQuiz(ResultSet rs) throws SQLException {
         Quiz quiz = new Quiz();
         quiz.setId(rs.getLong("id"));

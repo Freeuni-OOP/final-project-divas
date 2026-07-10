@@ -23,6 +23,7 @@ public class AdminServlet extends HttpServlet {
     private final AdminDAO adminDao = new AdminDAO();
     private final AnnouncementDAO announcementDao = new AnnouncementDAO();
     private final UserLookupDAO userDao = new UserLookupDAO();
+    private final org.example.quiz.dao.QuizDao quizDao = new org.example.quiz.dao.QuizDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -35,6 +36,8 @@ public class AdminServlet extends HttpServlet {
             req.setAttribute("announcements", announcementDao.getActiveAnnouncements());
             req.setAttribute("userCount", adminDao.countUsers());
             req.setAttribute("quizzesTaken", adminDao.countQuizzesTaken());
+            req.setAttribute("allQuizzes", quizDao.getAll());
+            req.setAttribute("error", req.getParameter("error"));
             req.getRequestDispatcher("/WEB-INF/jsp/admin.jsp").forward(req, resp);
         } catch (SQLException e) {
             throw new ServletException(e);
@@ -73,8 +76,11 @@ public class AdminServlet extends HttpServlet {
                     break;
                 }
                 case "removeUser": {
-                    long userId = parseLong(req.getParameter("userId"));
-                    adminDao.removeUser(userId);
+                    String username = req.getParameter("username");
+                    User target = userDao.getByUsername(username);
+                    if (target != null && target.getId() != adminId) {
+                        adminDao.removeUser(target.getId());
+                    }
                     break;
                 }
                 case "removeQuiz": {
@@ -83,8 +89,14 @@ public class AdminServlet extends HttpServlet {
                     break;
                 }
                 case "promoteToAdmin": {
-                    long userId = parseLong(req.getParameter("userId"));
-                    adminDao.promoteToAdmin(userId);
+                    String username = req.getParameter("username");
+                    User target = userDao.getByUsername(username);
+                    if (target != null) {
+                        adminDao.promoteToAdmin(target.getId());
+                    } else {
+                        resp.sendRedirect(req.getContextPath() + "/admin?error=User+not+found");
+                        return;
+                    }
                     break;
                 }
                 case "clearQuizHistory": {

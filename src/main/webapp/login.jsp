@@ -37,6 +37,9 @@
         </button>
     </form>
 
+    <p class="muted">New here?
+        <a href="${pageContext.request.contextPath}/register">Create an account</a>.</p>
+
 </div>
 
 </body>

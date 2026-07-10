@@ -10,9 +10,6 @@ import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
-/*
- * Real login. Replaces DevAuthServlet's /devlogin for authenticating users.
- */
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
@@ -48,6 +45,7 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = req.getSession(true);
             session.setAttribute(SessionUtil.USER_ID, user.getId());
             session.setAttribute(SessionUtil.USERNAME, user.getUsername());
+            session.setAttribute("isAdmin", user.isAdmin());
 
             resp.sendRedirect(req.getContextPath() + "/home");
         } catch (SQLException e) {
