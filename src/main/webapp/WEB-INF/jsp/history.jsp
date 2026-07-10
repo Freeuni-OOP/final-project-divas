@@ -21,7 +21,7 @@
 
 <h2>Achievements</h2>
 <c:choose>
-    <c:when test="${empty achievements}"><p>None yet — go take a quiz!</p></c:when>
+    <c:when test="${empty achievements}"><p>None yet go take a quiz!</p></c:when>
     <c:otherwise>
         <c:forEach var="ach" items="${achievements}">
             <span title="${ach.description}"><c:out value="${ach.label}"/></span>

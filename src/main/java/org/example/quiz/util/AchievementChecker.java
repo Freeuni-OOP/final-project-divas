@@ -1,8 +1,5 @@
 package org.example.quiz.util;
 
-//fixed by kesaria: called quizReadDAO.countCreatedQuizzes(...), but that method
-//doesn't exist on QuizReadDAO - it was only ever built on QuizDao; switched to QuizDao
-
 import org.example.quiz.dao.AchievementDAO;
 import org.example.quiz.dao.QuizDao;
 import org.example.quiz.dao.QuizAttemptDAO;
@@ -11,11 +8,6 @@ import org.example.quiz.model.QuizAttempt;
 
 import java.sql.SQLException;
 
-/**
- * NOTE: originally called quizReadDAO.countCreatedQuizzes(...), but that
- * method does not exist on QuizReadDAO - it was only ever built on QuizDao
- * (Part B). Corrected to use QuizDao here instead.
- */
 public class AchievementChecker {
 
     private final AchievementDAO achievementDAO = new AchievementDAO();

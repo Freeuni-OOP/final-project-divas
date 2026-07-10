@@ -6,6 +6,7 @@ import org.example.quiz.model.Question;
 import org.example.quiz.model.QuestionAnswer;
 import org.example.quiz.model.QuestionOption;
 import org.example.quiz.model.Quiz;
+import org.example.quiz.util.AchievementChecker;
 import org.example.quiz.util.SessionUtil;
 
 import javax.servlet.ServletException;
@@ -27,6 +28,7 @@ public class CreateQuizServlet extends HttpServlet {
 
     private final QuizDao quizDao = new QuizDao();
     private final QuestionDAO questionDao = new QuestionDAO();
+    private final AchievementChecker achievementChecker = new AchievementChecker();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -96,6 +98,8 @@ public class CreateQuizServlet extends HttpServlet {
                     questionDao.addAcceptedAnswers(questionId, answerList);
                 }
             }
+
+            achievementChecker.onQuizCreated(userId);
 
             resp.sendRedirect(req.getContextPath() + "/quiz?id=" + quizId);
         } catch (SQLException e) {

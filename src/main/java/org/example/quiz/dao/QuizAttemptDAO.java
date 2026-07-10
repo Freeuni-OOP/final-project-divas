@@ -55,15 +55,15 @@ public class QuizAttemptDAO {
      */
     public List<QuizAttempt> getTopScorers(long quizId, int limit) throws SQLException {
         String sql =
-                "SELECT a.*, u.username FROM quiz_attempts a "
+                "SELECT a.id, a.quiz_id, a.user_id, a.score_correct, a.score_total, "
+                        + "a.time_seconds, a.practice, a.taken_at, u.username FROM quiz_attempts a "
                         + "JOIN users u ON u.id=a.user_id "
                         + "JOIN ( "
-                        + "   SELECT user_id, MAX(score_correct) AS best "
+                        + "   SELECT user_id, MAX(score_correct) AS best, MIN(time_seconds) AS best_time "
                         + "   FROM quiz_attempts WHERE quiz_id=? AND practice=FALSE GROUP BY user_id "
-                        + ") b ON b.user_id=a.user_id AND b.best=a.score_correct "
+                        + ") b ON b.user_id=a.user_id AND b.best=a.score_correct AND b.best_time=a.time_seconds "
                         + "WHERE a.quiz_id=? AND a.practice=FALSE "
-                        + "GROUP BY a.user_id "
-                        + "ORDER BY a.score_correct DESC, MIN(a.time_seconds) ASC "
+                        + "ORDER BY a.score_correct DESC, a.time_seconds ASC "
                         + "LIMIT ?";
         return query(sql, quizId, quizId, limit);
     }
@@ -131,7 +131,7 @@ public class QuizAttemptDAO {
         return new double[]{0, 0, 0};
     }
 
-    /** Challenger's best score on a quiz — used to build CHALLENGE messages. */
+    /** Challenger's best score on a quiz, used to build CHALLENGE messages. */
     public int[] getBestScore(long userId, long quizId) throws SQLException {
         String sql = "SELECT score_correct, score_total FROM quiz_attempts "
                 + "WHERE user_id=? AND quiz_id=? AND practice=FALSE "
@@ -175,6 +175,19 @@ public class QuizAttemptDAO {
         try { a.setQuizTitle(rs.getString("quiz_title")); } catch (SQLException ignore) { }
         return a;
     }
+    public List<QuizAttempt> getFriendsRecentActivity(long userId, int limit) throws SQLException {
+        String sql =
+                "SELECT a.*, u.username, q.title AS quiz_title FROM quiz_attempts a "
+                        + "JOIN users u ON u.id=a.user_id "
+                        + "JOIN quizzes q ON q.id=a.quiz_id "
+                        + "WHERE a.practice=FALSE AND a.user_id IN ( "
+                        + "  SELECT CASE WHEN f.requester_id=? THEN f.addressee_id ELSE f.requester_id END "
+                        + "  FROM friendships f "
+                        + "  WHERE f.status='ACCEPTED' AND (f.requester_id=? OR f.addressee_id=?) "
+                        + ") ORDER BY a.taken_at DESC LIMIT ?";
+        return query(sql, userId, userId, userId, limit);
+    }
+
     public int countAttempts(long userId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM quiz_attempts WHERE user_id=? AND practice=FALSE";
         try (Connection c = Database.getConnection();

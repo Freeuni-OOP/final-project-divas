@@ -6,9 +6,9 @@ import java.sql.Timestamp;
  * An internal-mail message. (Part C)
  *
  * Three types are required by the spec:
- *   FRIEND_REQUEST — someone asked to be friends
- *   CHALLENGE      — a friend challenged the user to take a quiz (quizId set)
- *   NOTE           — free-text message
+ *   FRIEND_REQUEST: someone asked to be friends
+ *   CHALLENGE: a friend challenged the user to take a quiz (quizId set)
+ *   NOTE: free-text message
  */
 public class Message {
 

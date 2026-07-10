@@ -50,27 +50,42 @@
 <h2>Manage Users</h2>
 <form method="post" action="${pageContext.request.contextPath}/admin" class="card inline">
     <input type="hidden" name="action" value="removeUser"/>
-    <label>User ID <input type="text" name="userId" required/></label>
+    <label>Username <input type="text" name="username" required/></label>
     <button class="btn small ghost" type="submit">Remove User</button>
 </form>
 
 <form method="post" action="${pageContext.request.contextPath}/admin" class="card inline">
     <input type="hidden" name="action" value="promoteToAdmin"/>
-    <label>User ID <input type="text" name="userId" required/></label>
+    <label>Username <input type="text" name="username" required/></label>
     <button class="btn small" type="submit">Promote to Admin</button>
+    <c:if test="${not empty error}"><span class="error"><c:out value="${error}"/></span></c:if>
 </form>
 
 <h2>Manage Quizzes</h2>
-<form method="post" action="${pageContext.request.contextPath}/admin" class="card inline">
-    <input type="hidden" name="action" value="removeQuiz"/>
-    <label>Quiz ID <input type="text" name="quizId" required/></label>
-    <button class="btn small ghost" type="submit">Remove Quiz</button>
-</form>
-
-<form method="post" action="${pageContext.request.contextPath}/admin" class="card inline">
-    <input type="hidden" name="action" value="clearQuizHistory"/>
-    <label>Quiz ID <input type="text" name="quizId" required/></label>
-    <button class="btn small ghost" type="submit">Clear Quiz History</button>
-</form>
+<c:choose>
+    <c:when test="${empty allQuizzes}"><p>No quizzes yet.</p></c:when>
+    <c:otherwise>
+        <table class="tbl">
+            <tr><th>Title</th><th>Actions</th></tr>
+            <c:forEach var="q" items="${allQuizzes}">
+                <tr>
+                    <td><a href="${pageContext.request.contextPath}/quiz?id=${q.id}"><c:out value="${q.title}"/></a></td>
+                    <td>
+                        <form method="post" action="${pageContext.request.contextPath}/admin" class="inline">
+                            <input type="hidden" name="action" value="removeQuiz"/>
+                            <input type="hidden" name="quizId" value="${q.id}"/>
+                            <button class="btn small ghost" type="submit">Remove</button>
+                        </form>
+                        <form method="post" action="${pageContext.request.contextPath}/admin" class="inline">
+                            <input type="hidden" name="action" value="clearQuizHistory"/>
+                            <input type="hidden" name="quizId" value="${q.id}"/>
+                            <button class="btn small ghost" type="submit">Clear History</button>
+                        </form>
+                    </td>
+                </tr>
+            </c:forEach>
+        </table>
+    </c:otherwise>
+</c:choose>
 
 <%@ include file="footer.jspf" %>

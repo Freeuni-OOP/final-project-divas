@@ -6,6 +6,7 @@ import org.example.quiz.model.Question;
 import org.example.quiz.model.QuestionAnswer;
 import org.example.quiz.model.Quiz;
 import org.example.quiz.model.QuizAttempt;
+import org.example.quiz.util.AchievementChecker;
 import org.example.quiz.util.Grader;
 import org.example.quiz.util.SessionUtil;
 
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Quiz-taking flow. (Part C)
+ * Quiz-taking flow.
  *
  * GET  /take?quizId=..[&practice=true]  -> start the quiz
  * POST /take                            -> submit answers
@@ -29,17 +30,13 @@ import java.util.Map;
  * Supports both single-page (all questions at once) and multi-page
  * (one question per page) modes, with optional immediate correction on
  * multi-page. State for an in-progress attempt lives in the session.
- *
- * NOTE: originally assumed Question carried its own type enum, options,
- * and answers embedded on the object. Question was not built that way -
- * options/answers are fetched separately via QuizReadDAO.getOptions()/
- * getAnswers() at grading time instead.
  */
 @WebServlet("/take")
 public class TakeQuizServlet extends HttpServlet {
 
     private final QuizReadDAO quizDao = new QuizReadDAO();
     private final QuizAttemptDAO attemptDao = new QuizAttemptDAO();
+    private final AchievementChecker achievementChecker = new AchievementChecker();
 
     /** Session key holding the in-progress attempt state. */
     private static final String ATTEMPT = "takeState";
@@ -240,6 +237,8 @@ public class TakeQuizServlet extends HttpServlet {
         a.setPractice(st.practice);
         long attemptId = attemptDao.record(a);
         a.setId(attemptId);
+
+        achievementChecker.onQuizSubmitted(a);
 
         session.removeAttribute(ATTEMPT);
 

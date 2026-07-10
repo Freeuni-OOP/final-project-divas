@@ -16,6 +16,9 @@
     <a href="${pageContext.request.contextPath}/friends">Friends</a>
     <a href="${pageContext.request.contextPath}/inbox">Inbox</a>
     <a href="${pageContext.request.contextPath}/search">Find Users</a>
+    <c:if test="${sessionScope.isAdmin}">
+        <a href="${pageContext.request.contextPath}/admin">Admin</a>
+    </c:if>
     <a class="right" href="${pageContext.request.contextPath}/logout">Logout</a>
 </nav>
 <main class="container">
