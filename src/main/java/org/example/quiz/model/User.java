@@ -2,7 +2,7 @@ package org.example.quiz.model;
 
 import java.sql.Timestamp;
 
-/** Full auth fields are owned by Part A. */
+/** Full auth fields are owned by Part B. */
 public class User {
     private long id;
     private String username;

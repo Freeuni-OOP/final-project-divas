@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<!-- PLACEHOLDER — Part A (Auth) owns the real login/register.
+<!-- PLACEHOLDER — Part B (Auth) owns the real login/register.
      This stub lets Part C be tested independently. It sets a fake session
      user so you can navigate friends/inbox/quiz-taking without full auth.
      REMOVE before integration. -->
@@ -9,7 +9,7 @@
 <body>
 <div class="container">
     <h1>Login (placeholder)</h1>
-    <p class="muted">Part A will replace this with real authentication.</p>
+    <p class="muted">Part B will replace this with real authentication.</p>
     <form method="post" action="${pageContext.request.contextPath}/devlogin" class="card">
         <input type="text" name="userId" placeholder="user id (e.g. 1)" required/>
         <input type="text" name="username" placeholder="username" required/>

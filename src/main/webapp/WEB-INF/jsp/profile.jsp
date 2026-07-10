@@ -5,7 +5,7 @@
     </c:when>
     <c:otherwise>
         <h1><c:out value="${profileUser.username}"/></h1>
-        <p class="muted">Placeholder profile — Part A/D own the full version.</p>
+        <p class="muted">Placeholder profile — Part B/D own the full version.</p>
         <form method="post" action="${pageContext.request.contextPath}/friends" class="inline">
             <input type="hidden" name="to" value="${profileUser.id}"/>
             <button class="btn primary" name="action" value="request">Add Friend</button>

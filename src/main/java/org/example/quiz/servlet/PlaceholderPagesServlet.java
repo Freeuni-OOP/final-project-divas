@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * PLACEHOLDER pages for /home and /profile so Part C's links never 404.
- * Part D owns the real homepage; Part A/D own the real profile page.
+ * Part D owns the real homepage; Part B/D own the real profile page.
  * These render just enough to demo the social + quiz-taking flow.
  */
 @WebServlet({"/home", "/profile"})

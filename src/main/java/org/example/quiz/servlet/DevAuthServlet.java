@@ -7,7 +7,7 @@ import javax.servlet.http.*;
 import java.io.IOException;
 
 /**
- * PLACEHOLDER auth for testing Part C without Part A. (remove at integration)
+ * PLACEHOLDER auth for testing Part C without Part B's real auth. (remove at integration)
  *
  * POST /devlogin  -> stores userId/username in the session
  * GET  /logout    -> clears the session

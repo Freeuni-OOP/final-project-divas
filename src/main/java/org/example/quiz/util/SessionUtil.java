@@ -6,7 +6,7 @@ import javax.servlet.http.HttpSession;
 /**
  * Helper for reading login state from the session.
  *
- * Part A's login servlet is expected to set the session attribute "userId"
+ * Part B's login servlet is expected to set the session attribute "userId"
  * (Long) on successful login. C's servlets only read it.
  */
 public final class SessionUtil {

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Read-only user lookups. (used by Part C for friend search)
  *
- * The users table is owned by Part A. This DAO only reads it. If A's full
+ * The users table is owned by Part B. This DAO only reads it. If B's full
  * UserDAO exists, C can switch to it; this keeps C self-contained.
  */
 public class UserLookupDAO {
