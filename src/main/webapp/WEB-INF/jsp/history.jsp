@@ -1,8 +1,8 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ include file="header.jspf" %>
-<h1>Home</h1>
-<p class="muted">Placeholder homepage — Part D assembles the full version.</p>
+<h1>Your Quiz History</h1>
 
-<h2>Your Recent Quiz Activity</h2>
 <c:choose>
     <c:when test="${empty history}"><p>No quizzes taken yet.</p></c:when>
     <c:otherwise>
@@ -19,10 +19,7 @@
     </c:otherwise>
 </c:choose>
 
-<%--
-ADDED by Part D — Your Achievements section:
-
-<h2>Your Achievements</h2>
+<h2>Achievements</h2>
 <c:choose>
     <c:when test="${empty achievements}"><p>None yet — go take a quiz!</p></c:when>
     <c:otherwise>
@@ -31,22 +28,4 @@ ADDED by Part D — Your Achievements section:
         </c:forEach>
     </c:otherwise>
 </c:choose>
---%>
-
-<%--
-ADDED by Part D — Popular Quizzes section:
-
-<h2>Popular Quizzes</h2>
-<c:choose>
-    <c:when test="${empty popularQuizzes}"><p>No quizzes yet.</p></c:when>
-    <c:otherwise>
-        <c:forEach var="q" items="${popularQuizzes}">
-            <p><c:out value="${q.title}"/></p>
-        </c:forEach>
-    </c:otherwise>
-</c:choose>
---%>
-
-<p class="muted">Tip: to test the quiz flow, create a quiz via Part B, then open
-    <code>/take?quizId=&lt;id&gt;</code>.</p>
 <%@ include file="footer.jspf" %>
