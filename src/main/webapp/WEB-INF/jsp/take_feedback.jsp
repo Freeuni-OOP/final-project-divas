@@ -25,9 +25,7 @@
         <a class="btn primary" href="${pageContext.request.contextPath}/take?resume=1">Next Question</a>
     </c:when>
     <c:otherwise>
-        <form method="post" action="${pageContext.request.contextPath}/take">
-            <button type="submit" class="btn primary">See Results</button>
-        </form>
+        <a class="btn primary" href="${pageContext.request.contextPath}/take?resume=1">See Results</a>
     </c:otherwise>
 </c:choose>
 <%@ include file="footer.jspf" %>

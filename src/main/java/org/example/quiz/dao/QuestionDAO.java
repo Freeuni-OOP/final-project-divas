@@ -14,13 +14,14 @@ public class QuestionDAO {
     //saves a new question to the database and returns its generated id
     public long createQuestion(Question question) throws SQLException {
         String sql = "INSERT INTO questions " +
-                "(quiz_id, question_type, prompt, position) VALUES (?, ?, ?, ?)";
+                "(quiz_id, question_type, prompt, image_url, position) VALUES (?, ?, ?, ?, ?)";
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, question.getQuizId());
             ps.setString(2, question.getQuestionType());
             ps.setString(3, question.getQuestion());
-            ps.setInt(4, question.getNum());
+            ps.setString(4, question.getImageUrl());
+            ps.setInt(5, question.getNum());
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -83,6 +84,7 @@ public class QuestionDAO {
         question.setId(rs.getLong("id"));
         question.setQuizId(rs.getLong("quiz_id"));
         question.setQuestionType(rs.getString("question_type"));
+        question.setImageUrl(rs.getString("image_url"));
         question.setNum(rs.getInt("position"));
         return question;
     }
