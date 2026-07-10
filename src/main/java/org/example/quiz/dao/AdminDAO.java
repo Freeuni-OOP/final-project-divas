@@ -36,6 +36,16 @@ public class AdminDAO {
         }
     }
 
+    //clears all history (attempts) for a particular quiz, without deleting the quiz itself
+    public void clearQuizHistory(long quizId) throws SQLException {
+        String sql = "DELETE FROM quiz_attempts WHERE quiz_id=?";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, quizId);
+            ps.executeUpdate();
+        }
+    }
+
     //for site statistics
 
     //counts the number of users
