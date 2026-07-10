@@ -1,23 +1,28 @@
 package org.example.quiz.util;
 
-import org.example.quiz.model.Question;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import org.example.quiz.model.Question;
+import org.example.quiz.model.QuestionAnswer;
+import org.example.quiz.model.QuestionOption;
+
 import java.util.List;
-import java.util.Set;
 
 /**
  * Scoring logic for a single question. (Part C core)
+ *
+ * NOTE: this file originally assumed Question carried its own type as an
+ * enum (Question.Type) and its own embedded options/answers lists
+ * (q.getOptions()/q.getAnswers()). The actual Question class was not built
+ * that way - questionType is a plain String and options/answers are fetched
+ * separately (see QuizReadDAO.getOptions()/getAnswers()) and passed in here
+ * as parameters instead. The multi-answer ordered/unordered slot logic was
+ * also removed, since QuestionAnswer has no slot field - only the 4 required
+ * question types (each with a single slot) are supported.
  *
  * Rules from the spec:
  *  - Question-Response / Fill-Blank / Picture-Response may have several legal
  *    answers; any one match scores the (single) slot.
  *  - Multiple-Choice: correct if the chosen option is a correct option.
- *  - Multi-answer questions: each blank is a separate answer worth 1 point.
- *      * ordered   -> answer i must match the accepted answer(s) for slot i.
- *      * unordered -> each user answer matches any not-yet-used accepted answer,
- *                     and each accepted answer may only satisfy one slot.
  *
  * Comparison is case-insensitive and trims surrounding whitespace.
  */
@@ -39,93 +44,36 @@ public final class Grader {
     /**
      * Grade a question given the user's response(s).
      *
-     * @param q         the question (with its answers/options populated)
+     * @param q         the question being graded
+     * @param options   this question's options (only used for MULTIPLE_CHOICE)
+     * @param answers   this question's accepted text answers (used for the other 3 types)
      * @param responses user text responses; for multiple choice, responses[0]
-     *                  is the chosen option's text; for multi-answer, one entry
-     *                  per slot in slot order.
+     *                  is the chosen option's text.
      */
-    public static Result grade(Question q, List<String> responses) {
-        if (responses == null) responses = new ArrayList<>();
-        switch (q.getType()) {
-            case MULTIPLE_CHOICE:
-                return gradeMultipleChoice(q, responses);
-            case QUESTION_RESPONSE:
-            case FILL_BLANK:
-            case PICTURE_RESPONSE:
-            default:
-                return gradeTextual(q, responses);
+    public static Result grade(Question q, List<QuestionOption> options, List<QuestionAnswer> answers, List<String> responses) {
+        if (responses == null) responses = new java.util.ArrayList<>();
+        if ("MULTIPLE_CHOICE".equals(q.getQuestionType())) {
+            return gradeMultipleChoice(options, responses);
         }
+        return gradeTextual(answers, responses);
     }
 
-    private static Result gradeMultipleChoice(Question q, List<String> responses) {
+    private static Result gradeMultipleChoice(List<QuestionOption> options, List<String> responses) {
         String chosen = responses.isEmpty() ? "" : norm(responses.get(0));
         boolean right = false;
-        for (Question.Option o : q.getOptions()) {
-            if (o.isCorrect() && norm(o.getText()).equals(chosen)) { right = true; break; }
+        for (QuestionOption o : options) {
+            if (o.isCorrect() && norm(o.getOptionText()).equals(chosen)) { right = true; break; }
         }
         return new Result(right ? 1 : 0, 1);
     }
 
-    /**
-     * Handles single-slot textual questions AND multi-answer questions.
-     * Slot count comes from the accepted answers' slot indices.
-     */
-    private static Result gradeTextual(Question q, List<String> responses) {
-        int slots = q.getSlotCount();
-
-        if (slots <= 1) {
-            // single-answer: any accepted answer matches
-            String given = responses.isEmpty() ? "" : norm(responses.get(0));
-            for (Question.Answer a : q.getAnswers()) {
-                if (norm(a.getText()).equals(given)) return new Result(1, 1);
-            }
-            return new Result(0, 1);
+    /** Single-slot textual question: any accepted answer matches. */
+    private static Result gradeTextual(List<QuestionAnswer> answers, List<String> responses) {
+        String given = responses.isEmpty() ? "" : norm(responses.get(0));
+        for (QuestionAnswer a : answers) {
+            if (norm(a.getAnswer()).equals(given)) return new Result(1, 1);
         }
-
-        if (q.isOrdered()) {
-            return gradeOrdered(q, responses, slots);
-        }
-        return gradeUnordered(q, responses, slots);
-    }
-
-    /** Ordered multi-answer: response[i] must match an accepted answer for slot i. */
-    private static Result gradeOrdered(Question q, List<String> responses, int slots) {
-        int correct = 0;
-        for (int slot = 0; slot < slots; slot++) {
-            String given = slot < responses.size() ? norm(responses.get(slot)) : "";
-            if (given.isEmpty()) continue;
-            for (Question.Answer a : q.getAnswers()) {
-                if (a.getSlot() == slot && norm(a.getText()).equals(given)) { correct++; break; }
-            }
-        }
-        return new Result(correct, slots);
-    }
-
-    /**
-     * Unordered multi-answer: each user response may match any accepted answer.
-     * An accepted answer can satisfy only one slot, and a single user response
-     * cannot score twice. Note: there may be MORE accepted answers than slots
-     * (e.g. "name five Best-Picture winners"), which is fine.
-     */
-    private static Result gradeUnordered(Question q, List<String> responses, int slots) {
-        // Build the set of accepted answers (normalized).
-        Set<String> accepted = new HashSet<>();
-        for (Question.Answer a : q.getAnswers()) accepted.add(norm(a.getText()));
-
-        Set<String> usedResponses = new HashSet<>();  // avoid double-counting same answer twice
-        Set<String> consumed = new HashSet<>();        // accepted answers already matched
-        int correct = 0;
-
-        for (String r : responses) {
-            String given = norm(r);
-            if (given.isEmpty() || usedResponses.contains(given)) continue;
-            if (accepted.contains(given) && !consumed.contains(given)) {
-                correct++;
-                consumed.add(given);
-                usedResponses.add(given);
-                if (correct >= slots) break; // can't score more than the slots available
-            }
-        }
-        return new Result(correct, slots);
+        return new Result(0, 1);
     }
 }
+

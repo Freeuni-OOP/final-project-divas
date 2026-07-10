@@ -15,7 +15,7 @@
         <tr><th>Question</th><th>Your answer(s)</th><th>Score</th></tr>
         <c:forEach var="d" items="${details}">
             <tr class="${d.correct == d.total ? 'row-ok' : 'row-bad'}">
-                <td><c:out value="${d.question.prompt}"/></td>
+                <td><c:out value="${d.question.question}"/></td>
                 <td>
                     <c:forEach var="r" items="${d.responses}" varStatus="s">
                         <c:out value="${r}"/><c:if test="${!s.last}">, </c:if>
@@ -56,3 +56,4 @@
 <p><a class="btn" href="${pageContext.request.contextPath}/take?quizId=${quiz.id}">Retake</a>
    <a class="btn" href="${pageContext.request.contextPath}/home">Home</a></p>
 <%@ include file="footer.jspf" %>
+

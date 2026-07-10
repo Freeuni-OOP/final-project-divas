@@ -18,8 +18,8 @@ public class QuizAttemptDAO {
 
     public long record(QuizAttempt a) throws SQLException {
         String sql = "INSERT INTO quiz_attempts "
-                   + "(quiz_id, user_id, score_correct, score_total, time_seconds, practice) "
-                   + "VALUES (?, ?, ?, ?, ?, ?)";
+                + "(quiz_id, user_id, score_correct, score_total, time_seconds, practice) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, a.getQuizId());
@@ -38,8 +38,8 @@ public class QuizAttemptDAO {
 
     public QuizAttempt getById(long id) throws SQLException {
         String sql = "SELECT a.*, u.username, q.title AS quiz_title "
-                   + "FROM quiz_attempts a JOIN users u ON u.id=a.user_id "
-                   + "JOIN quizzes q ON q.id=a.quiz_id WHERE a.id=?";
+                + "FROM quiz_attempts a JOIN users u ON u.id=a.user_id "
+                + "JOIN quizzes q ON q.id=a.quiz_id WHERE a.id=?";
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setLong(1, id);
@@ -55,16 +55,16 @@ public class QuizAttemptDAO {
      */
     public List<QuizAttempt> getTopScorers(long quizId, int limit) throws SQLException {
         String sql =
-            "SELECT a.*, u.username FROM quiz_attempts a "
-          + "JOIN users u ON u.id=a.user_id "
-          + "JOIN ( "
-          + "   SELECT user_id, MAX(score_correct) AS best "
-          + "   FROM quiz_attempts WHERE quiz_id=? AND practice=FALSE GROUP BY user_id "
-          + ") b ON b.user_id=a.user_id AND b.best=a.score_correct "
-          + "WHERE a.quiz_id=? AND a.practice=FALSE "
-          + "GROUP BY a.user_id "
-          + "ORDER BY a.score_correct DESC, MIN(a.time_seconds) ASC "
-          + "LIMIT ?";
+                "SELECT a.*, u.username FROM quiz_attempts a "
+                        + "JOIN users u ON u.id=a.user_id "
+                        + "JOIN ( "
+                        + "   SELECT user_id, MAX(score_correct) AS best "
+                        + "   FROM quiz_attempts WHERE quiz_id=? AND practice=FALSE GROUP BY user_id "
+                        + ") b ON b.user_id=a.user_id AND b.best=a.score_correct "
+                        + "WHERE a.quiz_id=? AND a.practice=FALSE "
+                        + "GROUP BY a.user_id "
+                        + "ORDER BY a.score_correct DESC, MIN(a.time_seconds) ASC "
+                        + "LIMIT ?";
         return query(sql, quizId, quizId, limit);
     }
 
@@ -72,58 +72,58 @@ public class QuizAttemptDAO {
     public List<QuizAttempt> getTopScorersRecent(long quizId, int minutes, int limit)
             throws SQLException {
         String sql =
-            "SELECT a.*, u.username FROM quiz_attempts a "
-          + "JOIN users u ON u.id=a.user_id "
-          + "WHERE a.quiz_id=? AND a.practice=FALSE "
-          + "  AND a.taken_at >= (NOW() - INTERVAL ? MINUTE) "
-          + "ORDER BY a.score_correct DESC, a.time_seconds ASC LIMIT ?";
+                "SELECT a.*, u.username FROM quiz_attempts a "
+                        + "JOIN users u ON u.id=a.user_id "
+                        + "WHERE a.quiz_id=? AND a.practice=FALSE "
+                        + "  AND a.taken_at >= (NOW() - INTERVAL ? MINUTE) "
+                        + "ORDER BY a.score_correct DESC, a.time_seconds ASC LIMIT ?";
         return query(sql, quizId, minutes, limit);
     }
 
     /** Most recent attempts on a quiz (good and bad). */
     public List<QuizAttempt> getRecentAttempts(long quizId, int limit) throws SQLException {
         String sql =
-            "SELECT a.*, u.username FROM quiz_attempts a "
-          + "JOIN users u ON u.id=a.user_id "
-          + "WHERE a.quiz_id=? AND a.practice=FALSE "
-          + "ORDER BY a.taken_at DESC LIMIT ?";
+                "SELECT a.*, u.username FROM quiz_attempts a "
+                        + "JOIN users u ON u.id=a.user_id "
+                        + "WHERE a.quiz_id=? AND a.practice=FALSE "
+                        + "ORDER BY a.taken_at DESC LIMIT ?";
         return query(sql, quizId, limit);
     }
 
     /** A single user's past performance on a specific quiz. */
     public List<QuizAttempt> getUserHistoryForQuiz(long userId, long quizId) throws SQLException {
         String sql =
-            "SELECT a.*, u.username FROM quiz_attempts a "
-          + "JOIN users u ON u.id=a.user_id "
-          + "WHERE a.user_id=? AND a.quiz_id=? AND a.practice=FALSE "
-          + "ORDER BY a.taken_at DESC";
+                "SELECT a.*, u.username FROM quiz_attempts a "
+                        + "JOIN users u ON u.id=a.user_id "
+                        + "WHERE a.user_id=? AND a.quiz_id=? AND a.practice=FALSE "
+                        + "ORDER BY a.taken_at DESC";
         return query(sql, userId, quizId);
     }
 
     /** A user's full history across all quizzes (for the history page). */
     public List<QuizAttempt> getUserHistory(long userId, int limit) throws SQLException {
         String sql =
-            "SELECT a.*, u.username, q.title AS quiz_title FROM quiz_attempts a "
-          + "JOIN users u ON u.id=a.user_id "
-          + "JOIN quizzes q ON q.id=a.quiz_id "
-          + "WHERE a.user_id=? AND a.practice=FALSE "
-          + "ORDER BY a.taken_at DESC LIMIT ?";
+                "SELECT a.*, u.username, q.title AS quiz_title FROM quiz_attempts a "
+                        + "JOIN users u ON u.id=a.user_id "
+                        + "JOIN quizzes q ON q.id=a.quiz_id "
+                        + "WHERE a.user_id=? AND a.practice=FALSE "
+                        + "ORDER BY a.taken_at DESC LIMIT ?";
         return query(sql, userId, limit);
     }
 
     /** Summary stats for a quiz from the v_quiz_stats view. */
     public double[] getQuizStats(long quizId) throws SQLException {
         String sql = "SELECT attempts_count, avg_percent, avg_time_seconds "
-                   + "FROM v_quiz_stats WHERE quiz_id=?";
+                + "FROM v_quiz_stats WHERE quiz_id=?";
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setLong(1, quizId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return new double[]{
-                        rs.getDouble("attempts_count"),
-                        rs.getDouble("avg_percent"),
-                        rs.getDouble("avg_time_seconds")
+                            rs.getDouble("attempts_count"),
+                            rs.getDouble("avg_percent"),
+                            rs.getDouble("avg_time_seconds")
                     };
                 }
             }
@@ -134,8 +134,8 @@ public class QuizAttemptDAO {
     /** Challenger's best score on a quiz — used to build CHALLENGE messages. */
     public int[] getBestScore(long userId, long quizId) throws SQLException {
         String sql = "SELECT score_correct, score_total FROM quiz_attempts "
-                   + "WHERE user_id=? AND quiz_id=? AND practice=FALSE "
-                   + "ORDER BY score_correct DESC, time_seconds ASC LIMIT 1";
+                + "WHERE user_id=? AND quiz_id=? AND practice=FALSE "
+                + "ORDER BY score_correct DESC, time_seconds ASC LIMIT 1";
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setLong(1, userId);
@@ -175,7 +175,6 @@ public class QuizAttemptDAO {
         try { a.setQuizTitle(rs.getString("quiz_title")); } catch (SQLException ignore) { }
         return a;
     }
-   /*
     public int countAttempts(long userId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM quiz_attempts WHERE user_id=? AND practice=FALSE";
         try (Connection c = Database.getConnection();
@@ -202,6 +201,5 @@ public class QuizAttemptDAO {
             }
         }
     }
-
-    */
 }
+
