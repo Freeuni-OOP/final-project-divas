@@ -7,6 +7,7 @@ public class Question {
     private String questionType;
     private String question;
     private int num;     // numerical position of question
+    private String imageUrl;  // used only for PICTURE_RESPONSE questions
 
     //setter and getter for question text
     public Question(String question) {
@@ -44,5 +45,13 @@ public class Question {
     }
     public int getNum() {
         return num;
+    }
+
+    //setter and getter for the picture response image URL
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+    public String getImageUrl() {
+        return imageUrl;
     }
 }
