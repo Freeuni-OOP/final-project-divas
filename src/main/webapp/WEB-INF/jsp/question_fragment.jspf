@@ -1,35 +1,21 @@
-<%-- Renders one question's input(s). Expects request/loop var 'q' (Question). --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="question">
-    <p class="prompt"><c:out value="${q.prompt}"/></p>
+    <p class="prompt"><c:out value="${q.question}"/></p>
 
-    <c:if test="${q.type == 'PICTURE_RESPONSE' && not empty q.imageUrl}">
+    <c:if test="${q.questionType == 'PICTURE_RESPONSE' && not empty q.imageUrl}">
         <img class="q-image" src="<c:out value='${q.imageUrl}'/>" alt="question image"/>
     </c:if>
 
     <c:choose>
-        <%-- Multiple choice: radio buttons --%>
-        <c:when test="${q.type == 'MULTIPLE_CHOICE'}">
-            <c:forEach var="opt" items="${q.options}">
+        <c:when test="${q.questionType == 'MULTIPLE_CHOICE'}">
+            <c:forEach var="opt" items="${optionsMap[q.id]}">
                 <label class="option">
-                    <input type="radio" name="q${q.id}" value="<c:out value='${opt.text}'/>"/>
-                    <c:out value="${opt.text}"/>
+                    <input type="radio" name="q${q.id}" value="<c:out value='${opt.optionText}'/>"/>
+                    <c:out value="${opt.optionText}"/>
                 </label>
             </c:forEach>
         </c:when>
 
-        <%-- Multi-answer: one text field per slot --%>
-        <c:when test="${q.slotCount > 1}">
-            <c:forEach var="i" begin="0" end="${q.slotCount - 1}">
-                <input type="text" class="answer" name="q${q.id}_${i}"
-                       placeholder="Answer ${i + 1}"/>
-            </c:forEach>
-            <c:if test="${q.ordered}">
-                <small class="hint">(order matters)</small>
-            </c:if>
-        </c:when>
-
-        <%-- Single text answer --%>
         <c:otherwise>
             <input type="text" class="answer" name="q${q.id}" placeholder="Your answer"/>
         </c:otherwise>

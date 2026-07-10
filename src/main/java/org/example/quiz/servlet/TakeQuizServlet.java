@@ -3,6 +3,7 @@ package org.example.quiz.servlet;
 import org.example.quiz.dao.QuizAttemptDAO;
 import org.example.quiz.dao.QuizReadDAO;
 import org.example.quiz.model.Question;
+import org.example.quiz.model.QuestionAnswer;
 import org.example.quiz.model.Quiz;
 import org.example.quiz.model.QuizAttempt;
 import org.example.quiz.util.Grader;
@@ -15,7 +16,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Quiz-taking flow. (Part C)
@@ -26,6 +29,11 @@ import java.util.List;
  * Supports both single-page (all questions at once) and multi-page
  * (one question per page) modes, with optional immediate correction on
  * multi-page. State for an in-progress attempt lives in the session.
+ *
+ * NOTE: originally assumed Question carried its own type enum, options,
+ * and answers embedded on the object. Question was not built that way -
+ * options/answers are fetched separately via QuizReadDAO.getOptions()/
+ * getAnswers() at grading time instead.
  */
 @WebServlet("/take")
 public class TakeQuizServlet extends HttpServlet {
@@ -92,8 +100,20 @@ public class TakeQuizServlet extends HttpServlet {
         if (st.multiPage) {
             forwardCurrentQuestion(req, resp, quiz, st);
         } else {
+            try {
+                req.setAttribute("optionsMap", buildOptionsMap(quiz));
+            } catch (SQLException e) { throw new ServletException(e); }
             req.getRequestDispatcher("/WEB-INF/jsp/take_single.jsp").forward(req, resp);
         }
+    }
+
+    /** Options for every MULTIPLE_CHOICE question in the quiz, keyed by question id (for the single-page JSP). */
+    private Map<Long, List<org.example.quiz.model.QuestionOption>> buildOptionsMap(Quiz quiz) throws SQLException {
+        Map<Long, List<org.example.quiz.model.QuestionOption>> map = new HashMap<>();
+        for (Question q : quiz.getQuestions()) {
+            map.put(q.getId(), quizDao.getOptions(q.getId()));
+        }
+        return map;
     }
 
     /** Continue a multi-page immediate-correction quiz after feedback. */
@@ -146,7 +166,7 @@ public class TakeQuizServlet extends HttpServlet {
 
         for (Question q : quiz.getQuestions()) {
             List<String> responses = collectResponses(req, q);
-            Grader.Result r = Grader.grade(q, responses);
+            Grader.Result r = Grader.grade(q, quizDao.getOptions(q.getId()), quizDao.getAnswers(q.getId()), responses);
             correct += r.correct;
             total += r.total;
             details.add(new GradedAnswer(q, responses, r.correct, r.total));
@@ -161,7 +181,8 @@ public class TakeQuizServlet extends HttpServlet {
             throws SQLException, ServletException, IOException {
         Question current = findById(quiz, st.order.get(st.index));
         List<String> responses = collectResponses(req, current);
-        Grader.Result r = Grader.grade(current, responses);
+        List<QuestionAnswer> currentAnswers = quizDao.getAnswers(current.getId());
+        Grader.Result r = Grader.grade(current, quizDao.getOptions(current.getId()), currentAnswers, responses);
         st.correct += r.correct;
         st.total += r.total;
 
@@ -172,7 +193,7 @@ public class TakeQuizServlet extends HttpServlet {
             req.setAttribute("responses", responses);
             req.setAttribute("gotCorrect", r.correct);
             req.setAttribute("outOf", r.total);
-            req.setAttribute("acceptedAnswers", current.getAnswers());
+            req.setAttribute("acceptedAnswers", currentAnswers);
             st.index++;
             req.setAttribute("hasNext", st.index < st.order.size());
             req.getRequestDispatcher("/WEB-INF/jsp/take_feedback.jsp").forward(req, resp);
@@ -197,6 +218,11 @@ public class TakeQuizServlet extends HttpServlet {
         req.setAttribute("question", q);
         req.setAttribute("questionNumber", st.index + 1);
         req.setAttribute("questionCount", st.order.size());
+        try {
+            Map<Long, List<org.example.quiz.model.QuestionOption>> map = new HashMap<>();
+            map.put(q.getId(), quizDao.getOptions(q.getId()));
+            req.setAttribute("optionsMap", map);
+        } catch (SQLException e) { throw new ServletException(e); }
         req.getRequestDispatcher("/WEB-INF/jsp/take_multi.jsp").forward(req, resp);
     }
 
@@ -224,23 +250,11 @@ public class TakeQuizServlet extends HttpServlet {
 
     // ---- helpers ----
 
-    /**
-     * Collect the user's response(s) for a question from request params.
-     * Convention: single-slot params are named "q{id}"; multi-answer slots are
-     * "q{id}_{slot}".
-     */
+    /** Collect the user's response for a question from request params, named "q{id}". */
     private List<String> collectResponses(HttpServletRequest req, Question q) {
         List<String> out = new ArrayList<>();
-        int slots = q.getSlotCount();
-        if (q.getType() == Question.Type.MULTIPLE_CHOICE || slots <= 1) {
-            String v = req.getParameter("q" + q.getId());
-            out.add(v == null ? "" : v);
-        } else {
-            for (int i = 0; i < slots; i++) {
-                String v = req.getParameter("q" + q.getId() + "_" + i);
-                out.add(v == null ? "" : v);
-            }
-        }
+        String v = req.getParameter("q" + q.getId());
+        out.add(v == null ? "" : v);
         return out;
     }
 
@@ -264,3 +278,4 @@ public class TakeQuizServlet extends HttpServlet {
         }
     }
 }
+
